@@ -226,6 +226,25 @@ class TestParser(unittest.TestCase):
         # There are no general agreement how to interpret this line, so one have to use brackets here.
         self.assertRaises(ParserException, yacc.parse, r'x -> y -> z')
 
+    def test_readability(self):
+        formula = r'(p->q) /\ (q->s) /\ (s->r) /\ (r->~p) /\ p'
+        parsed = yacc.parse(formula)
+        self.assertEqual(parsed,
+            BinaryConjunction(
+                BinaryConjunction(
+                    BinaryConjunction(
+                        BinaryConjunction(
+                            BinaryImplication(Variable('p'), Variable('q')),
+                            BinaryImplication(Variable('q'), Variable('s'))
+                        ),
+                        BinaryImplication(Variable('s'), Variable('r'))
+                    ),
+                    BinaryImplication(Variable('r'), NegationOperator(Variable('p')))
+                ),
+                Variable('p')
+            )
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
