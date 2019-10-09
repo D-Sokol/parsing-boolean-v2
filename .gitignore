@@ -1,0 +1,8 @@
+**/*.py[cod]
+**/__pycache__
+
+venv
+
+# PLY temporary files
+*.out
+parsetab.py
