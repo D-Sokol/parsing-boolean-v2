@@ -1,7 +1,7 @@
 class Node:
     """
     Base class for representing formula in a binary tree.
-    
+
     This class supports some standard operations in the infix form,
     so one can write "F1 & F2" instead of BinaryConjunction(F1, F2).
     """
@@ -17,10 +17,10 @@ class Node:
 
     def __and__(self, other):
         return BinaryConjunction(self, other)
-    
+
     def __or__(self, other):
         return BinaryDisjunction(self, other)
-    
+
     def __rshift__(self, other):
         return BinaryImplication(self, other)
 
@@ -65,7 +65,7 @@ class Variable(Node):
 
 class NegationOperator(Node):
     truth_table = []
-    
+
     def __new__(cls, value):
         if isinstance(value, CustomBool):
             return CustomBool(not value)
@@ -92,7 +92,7 @@ class BinaryOperator(Node):
     # cls(False, False), cls(False, True), cls(True, False), cls(True, True)
     truth_table = []
     operator = ''
-    
+
     def __new__(cls, left, right):
         left_bool, right_bool = isinstance(left, CustomBool), isinstance(right, CustomBool)
         if left_bool and right_bool:
