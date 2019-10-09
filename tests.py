@@ -102,6 +102,91 @@ class TestVariable(unittest.TestCase):
         self.assertEqual(p >> ~q, BinaryImplication(p, ~q))
 
 
+class TestNegation(unittest.TestCase):
+    def test_creation(self):
+        with self.subTest('from Boolean'):
+            self.assertEqual(NegationOperator(f), t)
+            self.assertEqual(NegationOperator(t), f)
+        with self.subTest('from Variable'):
+            not_q = NegationOperator(q)
+            self.assertIsInstance(not_q, NegationOperator)
+            self.assertEqual(not_q.value, q)
+            self.assertEqual(not_q, ~q)
+            not_not_p = NegationOperator(~p)
+            self.assertIsInstance(not_not_p, Variable)
+            self.assertEqual(not_not_p, p)
+        with self.subTest('from Formula'):
+            not_c = NegationOperator(p & q)
+            self.assertIsInstance(not_c, NegationOperator)
+            self.assertEqual(not_c.value, p & q)
+            not_d = NegationOperator(q | ~p)
+            self.assertIsInstance(not_d, NegationOperator)
+            self.assertEqual(not_d.value, q | ~p)
+
+    def test_substitutions(self):
+        not_q = NegationOperator(q)
+        self.assertEqual(not_q.subs(q, False), True)
+        self.assertEqual(not_q.subs(q, True), False)
+        self.assertEqual(not_q.subs(p, False), not_q)
+        not_c = NegationOperator(p & q)
+        self.assertEqual(not_c.subs(p, False), True)
+        self.assertEqual(not_c.subs(p, True), not_q)
+        self.assertEqual(not_c.subs(r, False), not_c)
+
+    def test_str(self):
+        not_q = NegationOperator(q)
+        not_c = NegationOperator(p & q)
+        self.assertEqual(str(not_q), '~q')
+        self.assertEqual(str(not_c), r'~(p /\ q)')
+
+
+class TestConjunction(unittest.TestCase):
+    def test_creation(self):
+        c1 = BinaryConjunction(p, q)
+        self.assertIsInstance(c1, BinaryConjunction)
+        self.assertEqual(c1.left, p)
+        self.assertEqual(c1.right, q)
+        self.assertEqual(c1 & c1, c1)
+        c2 = BinaryConjunction(p & q, ~r)
+        self.assertIsInstance(c2, BinaryConjunction)
+        self.assertEqual(c2.left, c1)
+        self.assertEqual(c2.right, ~r)
+
+    def test_substitutions(self):
+        c2 = BinaryConjunction(p & q, ~r)
+        self.assertEqual(c2.subs(r, False), p & q)
+        self.assertEqual(c2.subs(r, True), f)
+        self.assertEqual(c2.subs(p, True), q & ~r)
+
+    def test_str(self):
+        self.assertEqual(str(p & q), r'(p /\ q)')
+        self.assertEqual(str((p & q) & ~r), r'((p /\ q) /\ ~r)')
+
+
+class TestDisjunction(unittest.TestCase):
+    def test_creation(self):
+        d1 = BinaryDisjunction(p, q)
+        self.assertIsInstance(d1, BinaryDisjunction)
+        self.assertEqual(d1.left, p)
+        self.assertEqual(d1.right, q)
+        self.assertEqual(d1 | d1, d1)
+        d2 = BinaryDisjunction(p & q, ~r)
+        self.assertIsInstance(d2, BinaryDisjunction)
+        self.assertEqual(d2.left, p & q)
+        self.assertEqual(d2.right, ~r)
+
+    def test_substitutions(self):
+        d2 = BinaryDisjunction(p & q, ~r)
+        self.assertEqual(d2.subs(r, False), t)
+        self.assertEqual(d2.subs(r, True), p & q)
+        self.assertEqual(d2.subs(p, True), q | ~r)
+        self.assertEqual(d2.subs(Variable('t'), False), d2)
+
+    def test_str(self):
+        self.assertEqual(str(p | q), r'(p \/ q)')
+        self.assertEqual(str((p & q) | ~r), r'((p /\ q) \/ ~r)')
+
+
 class TestParser(unittest.TestCase):
     def test_trivial(self):
         self.assertEqual(yacc.parse('p'), p)
