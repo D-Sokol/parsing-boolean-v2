@@ -3,7 +3,7 @@ from ply.lex import lex
 from ply import yacc
 
 from exceptions import CustomException
-from convertation import to_CNF, to_DNF
+from convertation import *
 from token_definitions import *
 
 lex()
@@ -16,8 +16,8 @@ if __name__ == '__main__':
             if not s:
                 continue
             parsed = yacc.parse(s)
-            print('DNF: ', to_DNF(parsed))
-            print('CNF: ', to_CNF(parsed))
+            print('DNF: ', dnf_to_string(optimize_clauses(to_DNF(parsed), True)))
+            print('CNF: ', cnf_to_string(optimize_clauses(to_CNF(parsed), False)))
         except EOFError:
             # add new line in output
             print()

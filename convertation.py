@@ -89,3 +89,55 @@ def extract_variables(tree):
         return extract_variables(tree.value)
     elif isinstance(tree, BinaryOperator):
         return extract_variables(tree.left) | extract_variables(tree.right)
+
+
+def cnf_to_string(clauses):
+    if isinstance(clauses, (bool, CustomBool)):
+        return '1' if clauses else '0'
+    return r' /\ '.join(
+                '({})'.format(r' \/ '.join(
+                    str(var) for var in clause
+                )) for clause in clauses
+            )
+
+
+def dnf_to_string(clauses):
+    if isinstance(clauses, (bool, CustomBool)):
+        return '1' if clauses else '0'
+    return r' \/ '.join(
+                '({})'.format(r' /\ '.join(
+                    str(var) for var in clause
+                )) for clause in clauses
+            )
+
+
+def optimize_clauses(clauses, default_value=None, recursive=True):
+    """
+    Optimizes given set of clauses using clauses which are single variables.
+    Returns equivalent set of clauses of default_value if the given set is
+    degenerate (equivalent to constant 0 or 1 depending on outer context).
+    """
+    if isinstance(clauses, bool):
+        return clauses
+
+    result = {clause for clause in clauses if len(clause) == 1}
+    if not result:
+        return clauses or default_value
+    variables = frozenset.union(*result)
+    negated_variables = frozenset({~p for p in variables})
+    if not variables.isdisjoint(negated_variables):
+        return default_value
+
+    for clause in clauses:
+        if clause.isdisjoint(variables):
+            new_clause = clause - negated_variables
+            if new_clause:
+                result.add(new_clause)
+            else:
+                return default_value
+    if not result:
+        return default_value
+    elif not recursive or result == clauses:
+        return result
+    else:
+        return optimize_clauses(result, default_value, recursive)

@@ -289,6 +289,16 @@ class TestConvertation(unittest.TestCase):
             observed = cnf.subs(p, p_).subs(q, q_).subs(r, r_)
             self.assertEqual(expected, observed)
 
+    def test_optimize_clauses(self):
+        p, q, r = Variable('p'), Variable('q'), Variable('r')
+        self.assertSetEqual(optimize_clauses({frozenset({p, q}), frozenset({~p})}), {frozenset({~p}), frozenset({q})})
+        self.assertSetEqual(optimize_clauses({frozenset({p, q}), frozenset({p})}), {frozenset({p})})
+
+        self.assertSetEqual(optimize_clauses({frozenset({p})}), {frozenset({p})})
+        self.assertIsNone(optimize_clauses({frozenset({p}), frozenset({~p})}))
+        self.assertIsNone(optimize_clauses({frozenset({~p, q, r}), frozenset({p}), frozenset({~p})}))
+        self.assertIsNone(optimize_clauses({frozenset({p}), frozenset({q}), frozenset({~p, ~q})}))
+
 
 if __name__ == '__main__':
     unittest.main()
