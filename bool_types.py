@@ -41,7 +41,6 @@ class Variable(Node):
     """
     Represents one boolean variable.
     """
-
     def __init__(self, letter):
         self.letter = letter
 
@@ -94,9 +93,15 @@ class NegationOperator(Node):
 class BinaryOperator(Node):
     # cls(False, False), cls(False, True), cls(True, False), cls(True, True)
     truth_table = []
+    # string form of this binary operator. Used when one prints the BinaryOperator instance.
     operator = ''
 
     def __new__(cls, left, right):
+        """
+        In general case returns BinaryOperator object that stores given left and right formulas.
+        However, if at least one of arguments are constant or arguments are the same,
+        returns equivalent simplified Node instance.
+        """
         left_bool, right_bool = isinstance(left, CustomBool), isinstance(right, CustomBool)
         if left_bool and right_bool:
             return CustomBool(cls.truth_table[2 * left + right])

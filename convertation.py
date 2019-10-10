@@ -15,6 +15,7 @@ def to_CNF(tree):
     variable = extract_variables(tree).pop()
 
     subclauses1 = to_CNF(tree.subs(variable, False))
+    # Check some degenerate cases
     if subclauses1 is True:
         subclauses1 = set()
     elif subclauses1 is False:
@@ -23,6 +24,7 @@ def to_CNF(tree):
         subclauses1 = {clause | {variable} for clause in subclauses1}
 
     subclauses2 = to_CNF(tree.subs(variable, True))
+    # Check some degenerate cases
     if subclauses2 is True:
         subclauses2 = set()
     elif subclauses2 is False:
@@ -53,6 +55,7 @@ def to_DNF(tree):
     variable = extract_variables(tree).pop()
 
     subclauses1 = to_DNF(tree.subs(variable, True))
+    # Check some degenerate cases
     if subclauses1 is False:
         subclauses1 = set()
     elif subclauses1 is True:
@@ -61,6 +64,7 @@ def to_DNF(tree):
         subclauses1 = {clause | {variable} for clause in subclauses1}
 
     subclauses2 = to_DNF(tree.subs(variable, False))
+    # Check some degenerate cases
     if subclauses2 is False:
         subclauses2 = set()
     elif subclauses2 is True:
@@ -92,6 +96,9 @@ def extract_variables(tree):
 
 
 def cnf_to_string(clauses):
+    """
+    Converts return value of to_CNF function to string.
+    """
     if isinstance(clauses, (bool, CustomBool)):
         return '1' if clauses else '0'
     return r' /\ '.join(
@@ -102,6 +109,9 @@ def cnf_to_string(clauses):
 
 
 def dnf_to_string(clauses):
+    """
+    Converts return value of to_DNF function to string.
+    """
     if isinstance(clauses, (bool, CustomBool)):
         return '1' if clauses else '0'
     return r' \/ '.join(

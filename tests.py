@@ -232,7 +232,8 @@ class TestParser(unittest.TestCase):
     def test_readability(self):
         formula = r'(p->q) /\ (q->s) /\ (s->r) /\ (r->~p) /\ p'
         parsed = yacc.parse(formula)
-        self.assertEqual(parsed,
+        self.assertEqual(
+            parsed,
             BinaryConjunction(
                 BinaryConjunction(
                     BinaryConjunction(
@@ -271,6 +272,8 @@ class TestConvertation(unittest.TestCase):
         for p_, q_, r_ in itertools.product([True, False], repeat=3):
             expected = formula.subs(p, p_).subs(q, q_).subs(r, r_)
             observed = dnf.subs(p, p_).subs(q, q_).subs(r, r_)
+            self.assertIsInstance(expected, CustomBool)
+            self.assertIsInstance(observed, CustomBool)
             self.assertEqual(expected, observed)
 
     def test_CNF(self):
@@ -287,10 +290,11 @@ class TestConvertation(unittest.TestCase):
         for p_, q_, r_ in itertools.product([True, False], repeat=3):
             expected = formula.subs(p, p_).subs(q, q_).subs(r, r_)
             observed = cnf.subs(p, p_).subs(q, q_).subs(r, r_)
+            self.assertIsInstance(expected, CustomBool)
+            self.assertIsInstance(observed, CustomBool)
             self.assertEqual(expected, observed)
 
     def test_optimize_clauses(self):
-        p, q, r = Variable('p'), Variable('q'), Variable('r')
         self.assertSetEqual(optimize_clauses({frozenset({p, q}), frozenset({~p})}), {frozenset({~p}), frozenset({q})})
         self.assertSetEqual(optimize_clauses({frozenset({p, q}), frozenset({p})}), {frozenset({p})})
 
