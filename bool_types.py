@@ -87,6 +87,9 @@ class NegationOperator(Node):
     def __repr__(self):
         return '~{}'.format(self.value)
 
+    def __hash__(self):
+        return hash((False, self.value))
+
 
 class BinaryOperator(Node):
     # cls(False, False), cls(False, True), cls(True, False), cls(True, True)
@@ -145,6 +148,9 @@ class BinaryOperator(Node):
 
     def __repr__(self):
         return '({left} {op} {right})'.format(left=self.left, op=self.operator, right=self.right)
+
+    def __hash__(self):
+        return hash((self.left, self.right))
 
 
 class BinaryConjunction(BinaryOperator):
