@@ -15,6 +15,7 @@ __file__ = 'ipython.py'
 lex.lex()
 yacc.yacc()
 from bool_types import *
+from convertation import *
 p, q = Variable('p'), Variable('q')
 t, f = CustomBool(True), CustomBool(False)
 "

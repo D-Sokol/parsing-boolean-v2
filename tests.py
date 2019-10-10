@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-
+import functools
+import itertools
+import operator
 import unittest
 
 from bool_types import *
@@ -256,10 +258,32 @@ class TestConvertation(unittest.TestCase):
         self.assertSetEqual(extract_variables(p >> (r | ~q)), {p, q, r})
 
     def test_DNF(self):
-        pass
+        self.assertSetEqual(to_DNF(p), {frozenset({p})})
+        self.assertSetEqual(to_DNF(~p), {frozenset({~p})})
+        self.assertSetEqual(to_DNF(p & ~q), {frozenset({p, ~q})})
+
+        formula = (p & q) >> (r | (~q & p))
+        dnf = functools.reduce(operator.or_,
+                               [functools.reduce(operator.and_, clause) for clause in to_DNF(formula)])
+        # Verify that both formulas are equivalent for all assignments.
+        for p_, q_, r_ in itertools.product([True, False], repeat=3):
+            expected = formula.subs(p, p_).subs(q, q_).subs(r, r_)
+            observed = dnf.subs(p, p_).subs(q, q_).subs(r, r_)
+            self.assertEqual(expected, observed)
 
     def test_CNF(self):
-        pass
+        self.assertSetEqual(to_CNF(p), {frozenset({p})})
+        self.assertSetEqual(to_CNF(~p), {frozenset({~p})})
+        self.assertSetEqual(to_CNF(p | ~q), {frozenset({p, ~q})})
+
+        formula = (p & q) >> (r | (~q & p))
+        cnf = functools.reduce(operator.and_,
+                               [functools.reduce(operator.or_, clause) for clause in to_CNF(formula)])
+        # Verify that both formulas are equivalent for all assignments.
+        for p_, q_, r_ in itertools.product([True, False], repeat=3):
+            expected = formula.subs(p, p_).subs(q, q_).subs(r, r_)
+            observed = cnf.subs(p, p_).subs(q, q_).subs(r, r_)
+            self.assertEqual(expected, observed)
 
 
 if __name__ == '__main__':
