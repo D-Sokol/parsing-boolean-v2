@@ -3,6 +3,7 @@
 import unittest
 
 from bool_types import *
+from convertation import *
 from parser import yacc
 from exceptions import LexerException, ParserException
 
@@ -244,6 +245,21 @@ class TestParser(unittest.TestCase):
                 Variable('p')
             )
         )
+
+
+class TestConvertation(unittest.TestCase):
+    def test_extraction(self):
+        self.assertSetEqual(extract_variables(t), set())
+        self.assertSetEqual(extract_variables(p), {p})
+        self.assertSetEqual(extract_variables(~p), {p})
+        self.assertSetEqual(extract_variables(p & q), {p, q})
+        self.assertSetEqual(extract_variables(p >> (r | ~q)), {p, q, r})
+
+    def test_DNF(self):
+        pass
+
+    def test_CNF(self):
+        pass
 
 
 if __name__ == '__main__':
