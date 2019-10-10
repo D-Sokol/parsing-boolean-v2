@@ -12,7 +12,7 @@ def to_CNF(tree):
         return bool(tree)
 
     # Formula that is not bool constant, always has at least one variable
-    variable = extract_variables(tree).pop()
+    variable = pick_variable(tree)
 
     subclauses1 = to_CNF(tree.subs(variable, False))
     # Check some degenerate cases
@@ -52,7 +52,7 @@ def to_DNF(tree):
         return bool(tree)
 
     # Formula that is not bool constant, always has at least one variable
-    variable = extract_variables(tree).pop()
+    variable = pick_variable(tree)
 
     subclauses1 = to_DNF(tree.subs(variable, True))
     # Check some degenerate cases
@@ -81,18 +81,23 @@ def to_DNF(tree):
         return result
 
 
-def extract_variables(tree):
+def pick_variable(tree):
     """
-    Returns set with all variables that are presented in the given formula.
+    Returns first variable that are presented in the given formula.
     """
+    if not isinstance(tree, Node):
+        raise TypeError
     if isinstance(tree, CustomBool):
-        return set()
-    elif isinstance(tree, Variable):
-        return {tree}
-    elif isinstance(tree, NegationOperator):
-        return extract_variables(tree.value)
-    elif isinstance(tree, BinaryOperator):
-        return extract_variables(tree.left) | extract_variables(tree.right)
+        return None
+    while True:
+        # tree cannot be CustomBool unless the very argument of function is CustomBool, what is checked.
+        # Therefore, one of the next conditions always satisfied.
+        if isinstance(tree, Variable):
+            return tree
+        elif isinstance(tree, NegationOperator):
+            tree = tree.value
+        elif isinstance(tree, BinaryOperator):
+            tree = tree.left
 
 
 def cnf_to_string(clauses):

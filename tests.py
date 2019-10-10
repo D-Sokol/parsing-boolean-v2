@@ -252,11 +252,11 @@ class TestParser(unittest.TestCase):
 
 class TestConvertation(unittest.TestCase):
     def test_extraction(self):
-        self.assertSetEqual(extract_variables(t), set())
-        self.assertSetEqual(extract_variables(p), {p})
-        self.assertSetEqual(extract_variables(~p), {p})
-        self.assertSetEqual(extract_variables(p & q), {p, q})
-        self.assertSetEqual(extract_variables(p >> (r | ~q)), {p, q, r})
+        self.assertIsNone(pick_variable(t))
+        self.assertEqual(pick_variable(p), p)
+        self.assertEqual(pick_variable(~p), p)
+        self.assertIn(pick_variable(p & q), {p, q})
+        self.assertIn(pick_variable(p >> (r | ~q)), {p, q, r})
 
     def test_DNF(self):
         self.assertIs(to_DNF(t), True)
