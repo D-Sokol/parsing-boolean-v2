@@ -258,6 +258,8 @@ class TestConvertation(unittest.TestCase):
         self.assertSetEqual(extract_variables(p >> (r | ~q)), {p, q, r})
 
     def test_DNF(self):
+        self.assertIs(to_DNF(t), True)
+        self.assertIs(to_DNF(f), False)
         self.assertSetEqual(to_DNF(p), {frozenset({p})})
         self.assertSetEqual(to_DNF(~p), {frozenset({~p})})
         self.assertSetEqual(to_DNF(p & ~q), {frozenset({p, ~q})})
@@ -272,6 +274,8 @@ class TestConvertation(unittest.TestCase):
             self.assertEqual(expected, observed)
 
     def test_CNF(self):
+        self.assertIs(to_CNF(t), True)
+        self.assertIs(to_CNF(f), False)
         self.assertSetEqual(to_CNF(p), {frozenset({p})})
         self.assertSetEqual(to_CNF(~p), {frozenset({~p})})
         self.assertSetEqual(to_CNF(p | ~q), {frozenset({p, ~q})})
